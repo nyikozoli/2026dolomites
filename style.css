@@ -544,6 +544,24 @@ img {
   color: var(--color-text);
 }
 
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--color-attraction-light);
+  color: var(--color-attraction);
+}
+
 .card-description {
   margin-top: 8px;
   font-size: 0.875rem;

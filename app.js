@@ -114,6 +114,7 @@
           name: r.Name || '',
           description: r.Description || '',
           link: r.Link || '',
+          tags: (r.Tags || '').split(',').map((t) => t.trim()).filter(Boolean),
           lat: c.lat,
           lng: c.lng,
         };
@@ -242,6 +243,7 @@
           <span class="card-badge ${p.type}">${p.type === 'attraction' ? '&#9968; Attraction' : '&#127968; Stay'}</span>
           ${p.order ? `<span class="card-order">#${p.order}</span>` : ''}
           <h3 class="card-title">${esc(p.name)}</h3>
+          ${p.tags && p.tags.length ? `<div class="card-tags">${p.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}
           <p class="card-description">${esc(p.description)}</p>
           <button class="read-more-toggle" onclick="event.stopPropagation()">&#9656; Read more</button>
           <div class="card-footer">
