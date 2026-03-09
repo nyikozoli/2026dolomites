@@ -174,7 +174,7 @@
       marker.bindPopup(
         `<strong>${esc(p.name)}</strong>` +
           (p.description ? `<p>${esc(p.description.substring(0, 120))}${p.description.length > 120 ? '...' : ''}</p>` : '') +
-          (p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">More info &rarr;</a>` : '')
+          (p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">Search on Google &rarr;</a>` : '')
       );
       marker.on('click', () => highlightPlace(p.id, 'map'));
       state.markers[p.id] = marker;
@@ -245,7 +245,7 @@
           <p class="card-description">${esc(p.description)}</p>
           <button class="read-more-toggle" onclick="event.stopPropagation()">&#9656; Read more</button>
           <div class="card-footer">
-            ${p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">View details &rarr;</a>` : '<span></span>'}
+            ${p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">Search on Google &rarr;</a>` : '<span></span>'}
             <div class="vote-buttons">
               <button class="vote-btn upvote${uv === 'up' ? ' active' : ''}" data-id="${p.id}" data-vote="up">
                 <span class="vote-icon">&#9650;</span> <span class="vote-count">${votes.up}</span>
