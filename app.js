@@ -17,7 +17,7 @@
     MAP_CENTER: [46.55, 12.05],
     MAP_ZOOM: 10,
     IMAGES_PER_PLACE: 3,
-    IMAGE_CACHE_KEY: 'dolomites_img_cache',
+    IMAGE_CACHE_KEY: 'dolomites_img_cache_v2',
     IMAGE_CACHE_TTL: 24 * 60 * 60 * 1000,
     VOTE_CACHE_KEY: 'dolomites_votes_v2',
     VOTER_KEY: 'dolomites_voter',
@@ -537,13 +537,32 @@
     }));
   }
 
+  // Custom search overrides for places that return poor Unsplash results
+  const SEARCH_OVERRIDES = {
+    'lago ghedina': 'alpine lake Cortina Dolomites',
+    'lago d\'antorno': 'Antorno lake Misurina Dolomites',
+    'cadini di misurina': 'Cadini Dolomites mountain peaks',
+    'dobbiaco': 'Toblach South Tyrol village',
+    'toblach': 'Toblach South Tyrol village',
+    'lago di dobbiaco': 'Toblacher See lake South Tyrol',
+    'col raiser': 'Col Raiser Seceda Dolomites',
+    'rifugio firenze': 'Rifugio Firenze Val Gardena Dolomites',
+  };
+
   // Simplify place name for better Unsplash search results
+  // Returns { query, isOverride } — overrides already include location context
   function simplifyQuery(name) {
-    return name
-      .replace(/\s*[-–—\/]\s*/g, ' ')      // "Lago di Braies / Pragser Wildsee" → separate words
+    const lower = name.toLowerCase();
+    for (const [key, override] of Object.entries(SEARCH_OVERRIDES)) {
+      if (lower.includes(key)) return { query: override, isOverride: true };
+    }
+
+    const cleaned = name
+      .replace(/\s*[-–—\/]\s*/g, ' ')
       .replace(/\b(trailhead|car park|parking|circuit|viewpoint|cable car|valley station|upper station|panorama|evening walk|photo stop|easy meadow loop|center|area)\b/gi, '')
       .replace(/\s+/g, ' ')
       .trim();
+    return { query: cleaned, isOverride: false };
   }
 
   async function loadImages(place) {
@@ -559,8 +578,8 @@
     }
 
     // Single optimized query — stay under rate limit (31 attractions ≤ 50 req/hr)
-    const simple = simplifyQuery(place.name);
-    const query = simple + ' Dolomites Italy';
+    const { query: simple, isOverride } = simplifyQuery(place.name);
+    const query = isOverride ? simple : simple + ' Dolomites Italy';
 
     let imgs = await searchUnsplash(query);
     if (imgs === null) { renderCarousel(place.id, []); return; } // rate limited
