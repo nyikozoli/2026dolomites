@@ -642,6 +642,32 @@ img {
   100% { transform: scale(1); }
 }
 
+/* Vote saved indicator */
+.card-footer {
+  position: relative;
+  flex-wrap: wrap;
+}
+
+.vote-indicator {
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--color-upvote);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.vote-indicator.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* ================================
    VOTER NAME MODAL
    ================================ */

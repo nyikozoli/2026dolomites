@@ -664,9 +664,24 @@
       updateVoteUI(id);
       saveCachedVotes();
 
-      // Animate
+      // Animate button press
       btn.classList.add('pressed');
       setTimeout(() => btn.classList.remove('pressed'), 300);
+
+      // Show saving indicator on card footer
+      const card = btn.closest('.place-card');
+      const footer = card?.querySelector('.card-footer');
+      let indicator = card?.querySelector('.vote-indicator');
+      if (footer && !indicator) {
+        indicator = document.createElement('div');
+        indicator.className = 'vote-indicator';
+        footer.appendChild(indicator);
+      }
+      if (indicator) {
+        indicator.textContent = next ? '✓ Vote saved' : '✓ Vote removed';
+        indicator.classList.add('show');
+        setTimeout(() => indicator.classList.remove('show'), 1800);
+      }
 
       // Send to backend via GET (avoids CORS issues with POST redirects)
       if (next && CONFIG.APPS_SCRIPT_URL) {
