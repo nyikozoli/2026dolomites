@@ -593,22 +593,41 @@
       if (state.voterName) return resolve(state.voterName);
       const modal = document.getElementById('voter-modal');
       const input = document.getElementById('voter-name-input');
-      const btn = document.getElementById('voter-name-submit');
+      const submitBtn = document.getElementById('voter-name-submit');
+      const cancelBtn = document.getElementById('voter-name-cancel');
+      const backdrop = modal.querySelector('.modal-backdrop');
       modal.classList.remove('hidden');
+      input.value = '';
       input.focus();
+
+      function cleanup() {
+        modal.classList.add('hidden');
+        submitBtn.onclick = null;
+        cancelBtn.onclick = null;
+        backdrop.onclick = null;
+        input.onkeydown = null;
+      }
 
       function submit() {
         const name = input.value.trim();
         if (!name) return;
         state.voterName = name;
         localStorage.setItem(CONFIG.VOTER_KEY, name);
-        modal.classList.add('hidden');
+        cleanup();
         resolve(name);
       }
 
-      btn.onclick = submit;
+      function cancel() {
+        cleanup();
+        resolve(null);
+      }
+
+      submitBtn.onclick = submit;
+      cancelBtn.onclick = cancel;
+      backdrop.onclick = cancel;
       input.onkeydown = (e) => {
         if (e.key === 'Enter') submit();
+        if (e.key === 'Escape') cancel();
       };
     });
   }
