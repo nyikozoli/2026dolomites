@@ -34,6 +34,9 @@
           <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
         </svg>
         <input type="text" id="search-input" placeholder="Search places..." autocomplete="off">
+        <button id="search-clear" class="search-clear hidden" aria-label="Clear search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
       </div>
       <div class="filter-buttons">
         <button class="filter-btn active" data-filter="all">All</button>
@@ -46,6 +49,10 @@
   <!-- MAP -->
   <section id="map-section">
     <div id="map"></div>
+    <a href="https://www.google.com/maps/d/edit?mid=186YNKXIuzQntUTEm-UIpSBxh2Vjqs5Y&usp=sharing" target="_blank" rel="noopener" class="google-map-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Open in Google Maps
+    </a>
   </section>
 
   <!-- STAYS -->

@@ -360,14 +360,31 @@
       });
     });
 
+    const searchInput = document.getElementById('search-input');
+    const clearBtn = document.getElementById('search-clear');
     let timer;
-    document.getElementById('search-input').addEventListener('input', (e) => {
+
+    function updateClearBtn() {
+      clearBtn.classList.toggle('hidden', !searchInput.value);
+    }
+
+    searchInput.addEventListener('input', (e) => {
+      updateClearBtn();
       clearTimeout(timer);
       timer = setTimeout(() => {
         state.searchQuery = e.target.value.toLowerCase().trim();
         renderCards();
         updateMapMarkers();
       }, 200);
+    });
+
+    clearBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      updateClearBtn();
+      state.searchQuery = '';
+      renderCards();
+      updateMapMarkers();
+      searchInput.focus();
     });
   }
 
@@ -577,19 +594,34 @@
     );
   }
 
+  function reconcileUserVotes() {
+    // Clear stale userVotes that have no matching server count
+    // (vote was likely lost due to network issues)
+    Object.keys(state.userVotes).forEach((id) => {
+      const dir = state.userVotes[id];
+      if (!dir) return;
+      const sv = state.votes[id];
+      if (!sv || sv[dir] === 0) {
+        delete state.userVotes[id];
+      }
+    });
+  }
+
   async function fetchVotes() {
     if (!CONFIG.APPS_SCRIPT_URL) return;
+
+    function applyVotes(data) {
+      state.votes = data.votes;
+      reconcileUserVotes();
+      state.places.forEach((p) => updateVoteUI(p.id));
+      saveCachedVotes();
+    }
 
     // Try fetch first, fall back to JSONP if CORS blocks the redirect
     try {
       const res = await fetch(CONFIG.APPS_SCRIPT_URL, { redirect: 'follow' });
       const data = await res.json();
-      if (data.status === 'ok' && data.votes) {
-        state.votes = data.votes;
-        state.places.forEach((p) => updateVoteUI(p.id));
-        saveCachedVotes();
-        return;
-      }
+      if (data.status === 'ok' && data.votes) { applyVotes(data); return; }
     } catch {
       // CORS redirect blocked — fall back to JSONP
     }
@@ -604,11 +636,7 @@
         document.head.appendChild(script);
         setTimeout(() => { if (window[cb]) { delete window[cb]; script.remove(); reject(new Error('JSONP timeout')); } }, 8000);
       });
-      if (data.status === 'ok' && data.votes) {
-        state.votes = data.votes;
-        state.places.forEach((p) => updateVoteUI(p.id));
-        saveCachedVotes();
-      }
+      if (data.status === 'ok' && data.votes) { applyVotes(data); }
     } catch (err) {
       console.warn(
         'Vote fetch failed. Make sure your Apps Script is deployed as:\n' +
@@ -749,9 +777,9 @@
           done = true;
           delete window[cbName];
           script.remove();
-          // Override local counts with server-aggregated data (correctly deduplicated)
-          if (data.status === 'ok' && data.votes) {
-            state.votes = data.votes;
+          // Only update THIS place's counts from server (avoids stale data overwriting other in-flight votes)
+          if (data.status === 'ok' && data.votes && data.votes[id]) {
+            state.votes[id] = data.votes[id];
             updateVoteUI(id);
             saveCachedVotes();
           }

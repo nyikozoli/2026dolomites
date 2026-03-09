@@ -205,7 +205,7 @@ img {
 
 #search-input {
   width: 100%;
-  padding: 10px 14px 10px 42px;
+  padding: 10px 36px 10px 42px;
   font-size: 0.938rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
@@ -222,6 +222,29 @@ img {
 
 #search-input::placeholder {
   color: var(--color-text-muted);
+}
+
+.search-clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.search-clear:hover {
+  color: var(--color-text);
+  background: var(--color-border);
 }
 
 .filter-buttons {
@@ -265,6 +288,26 @@ img {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
   z-index: 1;
+}
+
+.google-map-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 0.813rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.google-map-link:hover {
+  color: var(--color-attraction);
+}
+
+.google-map-link svg {
+  flex-shrink: 0;
 }
 
 /* Custom markers */
