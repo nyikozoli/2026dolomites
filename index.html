@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dolomites 2026 — Trip Planner</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- HERO -->
+  <header id="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">Dolomites 2026</h1>
+      <p class="hero-subtitle">August 16–22 &middot; Planning our alpine adventure</p>
+    </div>
+    <svg class="mountain-silhouette" viewBox="0 0 1440 120" preserveAspectRatio="none">
+      <path d="M0,120 L0,80 L120,40 L200,70 L280,20 L360,60 L440,10 L520,50 L600,30 L680,55 L760,15 L840,45 L920,25 L1000,60 L1080,35 L1160,65 L1240,20 L1320,50 L1440,30 L1440,120 Z" fill="var(--color-bg)"/>
+    </svg>
+  </header>
+
+  <!-- TOOLBAR -->
+  <nav id="toolbar">
+    <div class="toolbar-inner">
+      <div class="search-wrapper">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <input type="text" id="search-input" placeholder="Search places..." autocomplete="off">
+      </div>
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="attraction">Attractions</button>
+        <button class="filter-btn" data-filter="stay">Stays</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAP -->
+  <section id="map-section">
+    <div id="map"></div>
+  </section>
+
+  <!-- PLACES -->
+  <section id="places-section">
+    <div id="places-grid"></div>
+    <div id="no-results" class="hidden">
+      <p>No places match your search.</p>
+    </div>
+  </section>
+
+  <!-- VOTER NAME MODAL -->
+  <div id="voter-modal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <h2>What's your name?</h2>
+      <p>So we know who voted!</p>
+      <input type="text" id="voter-name-input" placeholder="Your name..." autocomplete="off" maxlength="30">
+      <button id="voter-name-submit" class="btn-primary">Let's go!</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <p>Loading Dolomites data...</p>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Made with love for our Dolomites adventure &middot; Data from <a href="https://docs.google.com/spreadsheets/d/1PwjRp80UIcYZlUaswUXdbWW_8I7qhmLRWPInoJPmcJQ/edit" target="_blank" rel="noopener">Google Sheets</a> &middot; Photos from <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a></p>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+          crossorigin=""></script>
+  <script src="app.js"></script>
+</body>
+</html>
