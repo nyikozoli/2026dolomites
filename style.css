@@ -549,19 +549,19 @@ img {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.85);
-  color: var(--color-text);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: rgba(0,0,0,0.45);
+  color: #fff;
   font-size: 1.1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2;
-  opacity: 0;
-  transition: opacity var(--transition-fast);
-  box-shadow: var(--shadow-sm);
+  opacity: 0.8;
+  transition: opacity var(--transition-fast), background var(--transition-fast);
+  box-shadow: none;
 }
 
 .card-images:hover .carousel-prev,
@@ -574,7 +574,7 @@ img {
 
 .carousel-prev:hover,
 .carousel-next:hover {
-  background: #fff;
+  background: rgba(0,0,0,0.7);
 }
 
 .image-fallback {
@@ -1131,6 +1131,11 @@ footer a:hover {
 
   .card-title {
     font-size: 1.1rem;
+  }
+
+  .carousel-prev,
+  .carousel-next {
+    opacity: 1;
   }
 }
 
