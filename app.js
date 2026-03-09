@@ -13,7 +13,7 @@
     // Paste your Unsplash Access Key here (https://unsplash.com/developers)
     UNSPLASH_ACCESS_KEY: 'ddK-ifsVxRtj1XjWZXWIqN-p5-xgXy4i3TEsOFAiAO0',
     // Paste your deployed Apps Script URL here
-    APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycby93fadgwqGWFI1zQYx6Ni8nYJNVNbHBim8_d4mL-RjQ1gHS4q0VqmyHA28QUM0rV_P/exec',
+    APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwOdbhxnO80UXzxm1nnPyxkKdWflRbJRI_02Ph4sVKnA1Flo_3zDpUlzHgFBBEghPU/exec',
     MAP_CENTER: [46.55, 12.05],
     MAP_ZOOM: 10,
     IMAGES_PER_PLACE: 3,
@@ -174,7 +174,7 @@
       marker.bindPopup(
         `<strong>${esc(p.name)}</strong>` +
           (p.description ? `<p>${esc(p.description.substring(0, 120))}${p.description.length > 120 ? '...' : ''}</p>` : '') +
-          `<a href="${esc(p.link)}" target="_blank" rel="noopener">More info &rarr;</a>`
+          (p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">More info &rarr;</a>` : '')
       );
       marker.on('click', () => highlightPlace(p.id, 'map'));
       state.markers[p.id] = marker;
@@ -244,7 +244,7 @@
           <h3 class="card-title">${esc(p.name)}</h3>
           <p class="card-description">${esc(p.description)}</p>
           <div class="card-footer">
-            <a href="${esc(p.link)}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">View details &rarr;</a>
+            ${p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">View details &rarr;</a>` : '<span></span>'}
             <div class="vote-buttons">
               <button class="vote-btn upvote${uv === 'up' ? ' active' : ''}" data-id="${p.id}" data-vote="up">
                 <span class="vote-icon">&#9650;</span> <span class="vote-count">${votes.up}</span>
