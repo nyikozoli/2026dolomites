@@ -555,6 +555,33 @@ img {
   overflow: hidden;
 }
 
+.card-description.expanded {
+  -webkit-line-clamp: unset;
+  display: block;
+}
+
+.read-more-toggle {
+  display: none;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.read-more-toggle:hover {
+  color: var(--color-primary-dark, #0a7a70);
+  text-decoration: underline;
+}
+
+.read-more-toggle.visible {
+  display: inline-block;
+}
+
 /* Card Footer */
 .card-footer {
   display: flex;

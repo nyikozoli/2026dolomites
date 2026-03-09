@@ -243,6 +243,7 @@
           ${p.order ? `<span class="card-order">#${p.order}</span>` : ''}
           <h3 class="card-title">${esc(p.name)}</h3>
           <p class="card-description">${esc(p.description)}</p>
+          <button class="read-more-toggle" onclick="event.stopPropagation()">&#9656; Read more</button>
           <div class="card-footer">
             ${p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">View details &rarr;</a>` : '<span></span>'}
             <div class="vote-buttons">
@@ -266,6 +267,7 @@
     });
 
     observeCards();
+    setupReadMoreToggles();
     // Stagger image loads — only attractions get photos (stays don't need them)
     const attractions = filtered.filter((p) => p.type === 'attraction');
     attractions.forEach((p, i) => setTimeout(() => loadImages(p), i * 300));
@@ -360,6 +362,27 @@
       { threshold: 0.05 }
     );
     document.querySelectorAll('.place-card:not(.visible)').forEach((c) => observer.observe(c));
+  }
+
+  function setupReadMoreToggles() {
+    document.querySelectorAll('.place-card').forEach((card) => {
+      const desc = card.querySelector('.card-description');
+      const toggle = card.querySelector('.read-more-toggle');
+      if (!desc || !toggle) return;
+
+      // Check if text is actually clamped (scrollHeight > visible height)
+      requestAnimationFrame(() => {
+        if (desc.scrollHeight > desc.clientHeight + 1) {
+          toggle.classList.add('visible');
+        }
+      });
+
+      toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const expanded = desc.classList.toggle('expanded');
+        toggle.innerHTML = expanded ? '&#9662; Show less' : '&#9656; Read more';
+      });
+    });
   }
 
   // ============================
