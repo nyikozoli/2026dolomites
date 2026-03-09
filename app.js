@@ -13,7 +13,7 @@
     // Paste your Unsplash Access Key here (https://unsplash.com/developers)
     UNSPLASH_ACCESS_KEY: 'ddK-ifsVxRtj1XjWZXWIqN-p5-xgXy4i3TEsOFAiAO0',
     // Paste your deployed Apps Script URL here
-    APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwQHYsIGffD8dFZU5PuycRzGzKCwUG2QRxLdvllttOG-Yb_m-iJWk4pUS7Cpjx9ViI0/exec',
+    APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycby93fadgwqGWFI1zQYx6Ni8nYJNVNbHBim8_d4mL-RjQ1gHS4q0VqmyHA28QUM0rV_P/exec',
     MAP_CENTER: [46.55, 12.05],
     MAP_ZOOM: 10,
     IMAGES_PER_PLACE: 3,
