@@ -172,15 +172,30 @@
   function addMarkers(places) {
     places.forEach((p) => {
       const marker = L.marker([p.lat, p.lng], { icon: createIcon(p.type, false) }).addTo(map);
+      const linkText = p.type === 'stay' ? 'View' : 'Search on Google';
       marker.bindPopup(
         `<strong>${esc(p.name)}</strong>` +
           (p.description ? `<p>${esc(p.description.substring(0, 120))}${p.description.length > 120 ? '...' : ''}</p>` : '') +
-          (p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">Search on Google &rarr;</a>` : '')
+          (p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">${linkText} &rarr;</a> &middot; ` : '') +
+          `<a href="#" class="popup-readmore" data-id="${p.id}">Read more &darr;</a>`
       );
       marker.on('click', () => highlightPlace(p.id, 'map'));
       state.markers[p.id] = marker;
     });
     fitMapBounds();
+
+    // Handle "Read more" clicks inside popups
+    map.on('popupopen', (e) => {
+      const link = e.popup.getElement().querySelector('.popup-readmore');
+      if (link) {
+        link.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          const id = link.dataset.id;
+          const card = document.querySelector(`.place-card[data-id="${id}"]`);
+          if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      }
+    });
   }
 
   function fitMapBounds() {
@@ -213,65 +228,76 @@
     return d.innerHTML;
   }
 
-  function renderCards() {
-    const grid = document.getElementById('places-grid');
-    const noResults = document.getElementById('no-results');
-    grid.innerHTML = '';
+  function buildCard(p, i) {
+    const votes = state.votes[p.id] || { up: 0, down: 0 };
+    const uv = state.userVotes[p.id] || '';
 
-    const filtered = state.places.filter(filterPlace);
-    noResults.classList.toggle('hidden', filtered.length > 0);
+    const card = document.createElement('div');
+    card.className = 'place-card';
+    card.dataset.id = p.id;
+    card.dataset.type = p.type;
+    card.style.transitionDelay = `${Math.min(i * 40, 400)}ms`;
 
-    filtered.forEach((p, i) => {
-      const votes = state.votes[p.id] || { up: 0, down: 0 };
-      const uv = state.userVotes[p.id] || '';
-
-      const card = document.createElement('div');
-      card.className = 'place-card';
-      card.dataset.id = p.id;
-      card.dataset.type = p.type;
-      card.style.transitionDelay = `${Math.min(i * 40, 400)}ms`;
-
-      card.innerHTML = `
-        ${p.type === 'attraction' ? `<div class="card-images" data-id="${p.id}">
-          <div class="image-carousel">
-            <div class="carousel-track">
-              <div class="image-placeholder">Loading photos...</div>
-            </div>
-          </div>
-        </div>` : ''}
-        <div class="card-body">
-          <span class="card-badge ${p.type}">${p.type === 'attraction' ? '&#9968; Attraction' : '&#127968; Stay'}</span>
-          ${p.order ? `<span class="card-order">#${p.order}</span>` : ''}
-          <h3 class="card-title">${esc(p.name)}</h3>
-          ${p.tags && p.tags.length ? `<div class="card-tags">${p.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}
-          <p class="card-description">${esc(p.description)}</p>
-          <button class="read-more-toggle" onclick="event.stopPropagation()">&#9656; Read more</button>
-          <div class="card-footer">
-            ${p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">Search on Google &rarr;</a>` : '<span></span>'}
-            <div class="vote-buttons">
-              <button class="vote-btn upvote${uv === 'up' ? ' active' : ''}" data-id="${p.id}" data-vote="up">
-                <span class="vote-icon">&#9650;</span> <span class="vote-count">${votes.up}</span>
-              </button>
-              <button class="vote-btn downvote${uv === 'down' ? ' active' : ''}" data-id="${p.id}" data-vote="down">
-                <span class="vote-icon">&#9660;</span> <span class="vote-count">${votes.down}</span>
-              </button>
-            </div>
+    card.innerHTML = `
+      ${p.type === 'attraction' ? `<div class="card-images" data-id="${p.id}">
+        <div class="image-carousel">
+          <div class="carousel-track">
+            <div class="image-placeholder">Loading photos...</div>
           </div>
         </div>
-      `;
+      </div>` : ''}
+      <div class="card-body">
+        ${p.order ? `<span class="card-order">#${p.order}</span>` : ''}
+        <h3 class="card-title">${esc(p.name)}</h3>
+        ${p.tags && p.tags.length ? `<div class="card-tags">${p.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}
+        <p class="card-description">${esc(p.description)}</p>
+        <button class="read-more-toggle" onclick="event.stopPropagation()">&#9656; Read more</button>
+        <div class="card-footer">
+          ${p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">${p.type === 'stay' ? 'View' : 'Search on Google'} &rarr;</a>` : '<span></span>'}
+          <div class="vote-buttons">
+            <span class="vote-label">Vote</span>
+            <button class="vote-btn upvote${uv === 'up' ? ' active' : ''}" data-id="${p.id}" data-vote="up" title="Upvote">
+              <span class="vote-icon">&#9650;</span> <span class="vote-count">${votes.up}</span>
+            </button>
+            <button class="vote-btn downvote${uv === 'down' ? ' active' : ''}" data-id="${p.id}" data-vote="down" title="Downvote">
+              <span class="vote-icon">&#9660;</span> <span class="vote-count">${votes.down}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
 
-      card.addEventListener('click', (e) => {
-        if (e.target.closest('.vote-btn') || e.target.closest('.card-link')) return;
-        highlightPlace(p.id, 'card');
-      });
-
-      grid.appendChild(card);
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.vote-btn') || e.target.closest('.card-link')) return;
+      highlightPlace(p.id, 'card');
     });
+
+    return card;
+  }
+
+  function renderCards() {
+    const attractionsGrid = document.getElementById('attractions-grid');
+    const staysGrid = document.getElementById('stays-grid');
+    const attractionsSection = document.getElementById('attractions-section');
+    const staysSection = document.getElementById('stays-section');
+    const noResults = document.getElementById('no-results');
+    attractionsGrid.innerHTML = '';
+    staysGrid.innerHTML = '';
+
+    const filtered = state.places.filter(filterPlace);
+    const attractions = filtered.filter((p) => p.type === 'attraction');
+    const stays = filtered.filter((p) => p.type === 'stay');
+
+    attractionsSection.classList.toggle('hidden', attractions.length === 0);
+    staysSection.classList.toggle('hidden', stays.length === 0);
+    noResults.classList.toggle('hidden', filtered.length > 0);
+
+    attractions.forEach((p, i) => attractionsGrid.appendChild(buildCard(p, i)));
+    stays.forEach((p, i) => staysGrid.appendChild(buildCard(p, i)));
 
     observeCards();
     setupReadMoreToggles();
-    // Stagger image loads — only attractions get photos (stays don't need them)
-    const attractions = filtered.filter((p) => p.type === 'attraction');
+    // Stagger image loads — only attractions get photos
     attractions.forEach((p, i) => setTimeout(() => loadImages(p), i * 300));
   }
 
@@ -292,13 +318,10 @@
 
     state.highlightedId = id;
 
-    // Highlight card
+    // Highlight card (no auto-scroll from map — popup has "Read more" link for that)
     const card = document.querySelector(`.place-card[data-id="${id}"]`);
     if (card) {
       card.classList.add('highlighted');
-      if (source === 'map') {
-        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
     }
 
     // Highlight marker

@@ -309,16 +309,30 @@ img {
   margin-bottom: 6px;
 }
 
+.popup-readmore {
+  font-weight: 500;
+}
+
 /* ================================
    PLACES GRID
    ================================ */
-#places-section {
+.places-section {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 24px 24px 48px;
+  padding: 24px 24px 8px;
 }
 
-#places-grid {
+.section-heading {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.places-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 24px;
@@ -583,7 +597,7 @@ img {
   margin-top: 4px;
   font-size: 0.8rem;
   font-weight: 500;
-  color: var(--color-primary);
+  color: var(--color-attraction);
   background: none;
   border: none;
   padding: 0;
@@ -592,7 +606,7 @@ img {
 }
 
 .read-more-toggle:hover {
-  color: var(--color-primary-dark, #0a7a70);
+  color: #0f766e;
   text-decoration: underline;
 }
 
@@ -628,7 +642,17 @@ img {
 /* Vote Buttons */
 .vote-buttons {
   display: flex;
+  align-items: center;
   gap: 6px;
+}
+
+.vote-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  margin-right: 2px;
 }
 
 .vote-btn {
@@ -900,11 +924,11 @@ footer a:hover {
     border-radius: var(--radius-md);
   }
 
-  #places-section {
-    padding: 16px 16px 48px;
+  .places-section {
+    padding: 16px 16px 32px;
   }
 
-  #places-grid {
+  .places-grid {
     grid-template-columns: 1fr;
     gap: 16px;
   }
