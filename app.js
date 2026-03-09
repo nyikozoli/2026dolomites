@@ -172,11 +172,13 @@
   function addMarkers(places) {
     places.forEach((p) => {
       const marker = L.marker([p.lat, p.lng], { icon: createIcon(p.type, false) }).addTo(map);
-      const linkText = p.type === 'stay' ? 'View' : 'Search on Google';
+      const popupLinks = p.links.map((l) =>
+        `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} &rarr;</a>`
+      ).join(' &middot; ');
       marker.bindPopup(
         `<strong>${esc(p.name)}</strong>` +
           (p.description ? `<p>${esc(p.description.substring(0, 120))}${p.description.length > 120 ? '...' : ''}</p>` : '') +
-          (p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">${linkText} &rarr;</a> &middot; ` : '') +
+          (popupLinks ? popupLinks + ' &middot; ' : '') +
           `<a href="#" class="popup-readmore" data-id="${p.id}">Read more &darr;</a>`
       );
       marker.on('click', () => highlightPlace(p.id, 'map'));
@@ -295,7 +297,7 @@
         <p class="card-description">${esc(p.description)}</p>
         <button class="read-more-toggle" onclick="event.stopPropagation()">&#9656; Read more</button>
         <div class="card-footer">
-          ${p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">${p.type === 'stay' ? 'View' : 'Search on Google'} &rarr;</a>` : '<span></span>'}
+          ${p.links.length ? `<div class="card-links">${p.links.map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">${esc(l.label)} &rarr;</a>`).join('')}</div>` : '<span></span>'}
           <div class="vote-buttons">
             <span class="vote-label">Vote</span>
             <button class="vote-btn upvote${uv === 'up' ? ' active' : ''}" data-id="${p.id}" data-vote="up" title="Upvote" aria-label="Upvote ${esc(p.name)}">
