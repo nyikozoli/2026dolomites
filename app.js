@@ -113,7 +113,7 @@
           order: parseInt(r.Order) || 0,
           name: r.Name || '',
           description: r.Description || '',
-          link: r.Link || '',
+          links: parseLinks(r.Link || '', 'attraction'),
           tags: (r.Tags || '').split(',').map((t) => t.trim()).filter(Boolean),
           lat: c.lat,
           lng: c.lng,
@@ -133,7 +133,7 @@
           order: 0,
           name: r.name || r.Name || '',
           description: r.description || r.Description || '',
-          link: r.Link || r.link || '',
+          links: parseLinks(r.Link || r.link || '', 'stay'),
           lat: c.lat,
           lng: c.lng,
         };
@@ -228,6 +228,48 @@
     return d.innerHTML;
   }
 
+  function parseLinks(raw, type) {
+    if (!raw) return [];
+    return raw.split(',').map((s) => s.trim()).filter(Boolean).map((url) => {
+      let label;
+      try {
+        const host = new URL(url).hostname.replace('www.', '');
+        if (host.includes('google.com')) label = 'Search on Google';
+        else if (host.includes('booking.com')) label = 'Booking.com';
+        else if (host.includes('airbnb')) label = 'Airbnb';
+        else if (host.includes('tripadvisor')) label = 'TripAdvisor';
+        else if (host.includes('alltrails')) label = 'AllTrails';
+        else if (host.includes('komoot')) label = 'Komoot';
+        else if (host.includes('maps.app')) label = 'Google Maps';
+        else if (host.includes('youtube') || host.includes('youtu.be')) label = 'YouTube';
+        else if (host.includes('instagram')) label = 'Instagram';
+        else if (host.includes('facebook')) label = 'Facebook';
+        else if (type === 'stay') label = 'View';
+        else label = host.split('.')[0].charAt(0).toUpperCase() + host.split('.')[0].slice(1);
+      } catch {
+        label = type === 'stay' ? 'View' : 'Link';
+      }
+      return { url, label };
+    });
+  }
+
+  const TAG_GROUPS = {
+    'easy': 'easy', 'easy access': 'easy', 'easy detour': 'easy', 'short': 'easy',
+    'moderate': 'moderate',
+    'ropes': 'hard', 'exposed': 'hard', 'heights': 'hard',
+    'crowded': 'crowd', 'early start': 'crowd', 'iconic': 'crowd', 'lively': 'crowd',
+    'panorama': 'scenery', 'viewpoint': 'scenery', 'views': 'scenery',
+    'photo': 'scenery', 'photo stop': 'scenery', 'sunset': 'scenery', 'sunrise': 'scenery',
+    'lake': 'nature', 'forest': 'nature', 'meadows': 'nature', 'flowers': 'nature',
+    'nature': 'nature', 'quiet': 'nature', 'relaxing': 'nature', 'ridge': 'nature',
+    'boating': 'activity', 'shopping': 'activity', 'shops': 'activity',
+    'restaurant': 'activity', 'lunch stop': 'activity', 'cable car': 'activity',
+    'parking': 'logistics', 'roadside': 'logistics', 'trailhead': 'logistics',
+    'transport': 'logistics', 'base camp': 'logistics', 'hut': 'logistics',
+    'city': 'logistics', 'small town': 'logistics', 'optional': 'logistics',
+  };
+  function tagGroup(t) { return TAG_GROUPS[t.toLowerCase()] || 'default'; }
+
   function buildCard(p, i) {
     const votes = state.votes[p.id] || { up: 0, down: 0 };
     const uv = state.userVotes[p.id] || '';
@@ -249,18 +291,18 @@
       <div class="card-body">
         ${p.order ? `<span class="card-order">#${p.order}</span>` : ''}
         <h3 class="card-title">${esc(p.name)}</h3>
-        ${p.tags && p.tags.length ? `<div class="card-tags">${p.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}
+        ${p.tags && p.tags.length ? `<div class="card-tags">${p.tags.map((t) => `<span class="tag" data-group="${tagGroup(t)}">${esc(t)}</span>`).join('')}</div>` : ''}
         <p class="card-description">${esc(p.description)}</p>
         <button class="read-more-toggle" onclick="event.stopPropagation()">&#9656; Read more</button>
         <div class="card-footer">
           ${p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">${p.type === 'stay' ? 'View' : 'Search on Google'} &rarr;</a>` : '<span></span>'}
           <div class="vote-buttons">
             <span class="vote-label">Vote</span>
-            <button class="vote-btn upvote${uv === 'up' ? ' active' : ''}" data-id="${p.id}" data-vote="up" title="Upvote">
-              <span class="vote-icon">&#9650;</span> <span class="vote-count">${votes.up}</span>
+            <button class="vote-btn upvote${uv === 'up' ? ' active' : ''}" data-id="${p.id}" data-vote="up" title="Upvote" aria-label="Upvote ${esc(p.name)}">
+              <span class="vote-icon" aria-hidden="true">&#9650;</span> <span class="vote-count">${votes.up}</span>
             </button>
-            <button class="vote-btn downvote${uv === 'down' ? ' active' : ''}" data-id="${p.id}" data-vote="down" title="Downvote">
-              <span class="vote-icon">&#9660;</span> <span class="vote-count">${votes.down}</span>
+            <button class="vote-btn downvote${uv === 'down' ? ' active' : ''}" data-id="${p.id}" data-vote="down" title="Downvote" aria-label="Downvote ${esc(p.name)}">
+              <span class="vote-icon" aria-hidden="true">&#9660;</span> <span class="vote-count">${votes.down}</span>
             </button>
           </div>
         </div>
@@ -513,7 +555,7 @@
     if (!container) return;
 
     if (!images || images.length === 0) {
-      container.innerHTML = `<div class="image-fallback"><span>&#9968;</span></div>`;
+      container.innerHTML = `<div class="image-fallback"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3l4 8 5-5 2 15H2L8 3z"/></svg></div>`;
       return;
     }
 
@@ -530,15 +572,15 @@
       .join('');
 
     const dots = images
-      .map((_, i) => `<button class="carousel-dot${i === 0 ? ' active' : ''}" data-index="${i}"></button>`)
+      .map((_, i) => `<button class="carousel-dot${i === 0 ? ' active' : ''}" data-index="${i}" aria-label="Photo ${i + 1}"></button>`)
       .join('');
 
     container.innerHTML = `
       <div class="image-carousel">
         <div class="carousel-track">${slides}</div>
         ${images.length > 1 ? `<div class="carousel-dots">${dots}</div>
-        <button class="carousel-prev" onclick="event.stopPropagation()">&lsaquo;</button>
-        <button class="carousel-next" onclick="event.stopPropagation()">&rsaquo;</button>` : ''}
+        <button class="carousel-prev" onclick="event.stopPropagation()" aria-label="Previous photo">&lsaquo;</button>
+        <button class="carousel-next" onclick="event.stopPropagation()" aria-label="Next photo">&rsaquo;</button>` : ''}
       </div>`;
 
     if (images.length > 1) setupCarouselNav(container);

@@ -373,6 +373,14 @@ img {
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-icon {
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
 }
 
 .places-grid {
@@ -465,7 +473,7 @@ img {
   position: absolute;
   bottom: 6px;
   right: 8px;
-  font-size: 0.625rem;
+  font-size: 0.7rem;
   color: rgba(255,255,255,0.7);
   background: rgba(0,0,0,0.35);
   padding: 2px 6px;
@@ -615,8 +623,56 @@ img {
   letter-spacing: 0.02em;
   padding: 2px 8px;
   border-radius: 99px;
-  background: var(--color-attraction-light);
-  color: var(--color-attraction);
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* Difficulty: easy → green */
+.tag[data-group="easy"] {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* Difficulty: moderate → amber */
+.tag[data-group="moderate"] {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+/* Difficulty: hard / danger → red */
+.tag[data-group="hard"] {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Crowded / popular → orange */
+.tag[data-group="crowd"] {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+/* Scenery / views → sky blue */
+.tag[data-group="scenery"] {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+/* Nature / outdoors → emerald */
+.tag[data-group="nature"] {
+  background: #d1fae5;
+  color: #047857;
+}
+
+/* Activities → purple */
+.tag[data-group="activity"] {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+/* Logistics / info → slate */
+.tag[data-group="logistics"] {
+  background: #f1f5f9;
+  color: #475569;
 }
 
 .card-description {
@@ -919,7 +975,7 @@ img {
 footer {
   text-align: center;
   padding: 32px 24px;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   font-size: 0.8rem;
   border-top: 1px solid var(--color-border);
 }
@@ -989,5 +1045,37 @@ footer a:hover {
   .filter-btn {
     padding: 7px 14px;
     font-size: 0.813rem;
+  }
+}
+
+/* ================================
+   ACCESSIBILITY
+   ================================ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ================================
+   REDUCED MOTION
+   ================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .place-card {
+    opacity: 1;
+    transform: none;
   }
 }
