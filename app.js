@@ -632,6 +632,8 @@
     });
   }
 
+  const voteCooldowns = {};
+
   function setupVoteHandlers() {
     document.addEventListener('click', async (e) => {
       const btn = e.target.closest('.vote-btn');
@@ -640,6 +642,10 @@
 
       const id = btn.dataset.id;
       const voteType = btn.dataset.vote;
+
+      // Prevent rapid clicks (2 second cooldown per place)
+      if (voteCooldowns[id] && Date.now() - voteCooldowns[id] < 2000) return;
+      voteCooldowns[id] = Date.now();
       const place = state.places.find((p) => p.id === id);
       if (!place) return;
 
