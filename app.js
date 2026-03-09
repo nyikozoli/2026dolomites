@@ -301,10 +301,10 @@
           <div class="vote-buttons">
             <span class="vote-label">Vote</span>
             <button class="vote-btn upvote${uv === 'up' ? ' active' : ''}" data-id="${p.id}" data-vote="up" title="Upvote" aria-label="Upvote ${esc(p.name)}">
-              <span class="vote-icon" aria-hidden="true">&#9650;</span> <span class="vote-count">${votes.up}</span>
+              <span class="vote-icon" aria-hidden="true">&#9650;</span> <span class="vote-count${votes.up === 0 ? ' zero' : ''}">${votes.up}</span>
             </button>
             <button class="vote-btn downvote${uv === 'down' ? ' active' : ''}" data-id="${p.id}" data-vote="down" title="Downvote" aria-label="Downvote ${esc(p.name)}">
-              <span class="vote-icon" aria-hidden="true">&#9660;</span> <span class="vote-count">${votes.down}</span>
+              <span class="vote-icon" aria-hidden="true">&#9660;</span> <span class="vote-count${votes.down === 0 ? ' zero' : ''}">${votes.down}</span>
             </button>
           </div>
         </div>
@@ -335,6 +335,18 @@
     attractionsSection.classList.toggle('section-hidden', attractions.length === 0);
     staysSection.classList.toggle('section-hidden', stays.length === 0);
     noResults.classList.toggle('hidden', filtered.length > 0);
+
+    // Update results counter
+    const counter = document.getElementById('results-counter');
+    if (counter) {
+      if (state.searchQuery) {
+        counter.textContent = `${filtered.length} result${filtered.length !== 1 ? 's' : ''} for "${state.searchQuery}"`;
+      } else if (state.activeFilter !== 'all') {
+        counter.textContent = `Showing ${filtered.length} ${state.activeFilter}${filtered.length !== 1 ? 's' : ''}`;
+      } else {
+        counter.textContent = `${attractions.length} attractions · ${stays.length} stays`;
+      }
+    }
 
     attractions.forEach((p, i) => attractionsGrid.appendChild(buildCard(p, i)));
     stays.forEach((p, i) => staysGrid.appendChild(buildCard(p, i)));
@@ -712,12 +724,16 @@
     const up = card.querySelector('.upvote');
     const down = card.querySelector('.downvote');
     if (up) {
-      up.querySelector('.vote-count').textContent = v.up;
+      const upCount = up.querySelector('.vote-count');
+      upCount.textContent = v.up;
+      upCount.classList.toggle('zero', v.up === 0);
       up.classList.toggle('active', uv === 'up');
       up.setAttribute('aria-label', `Upvote ${name}, ${v.up} votes`);
     }
     if (down) {
-      down.querySelector('.vote-count').textContent = v.down;
+      const downCount = down.querySelector('.vote-count');
+      downCount.textContent = v.down;
+      downCount.classList.toggle('zero', v.down === 0);
       down.classList.toggle('active', uv === 'down');
       down.setAttribute('aria-label', `Downvote ${name}, ${v.down} votes`);
     }
@@ -866,8 +882,62 @@
   }
 
   // ============================
+  // TOOLBAR SCROLL SHADOW
+  // ============================
+  function setupToolbarShadow() {
+    const toolbar = document.getElementById('toolbar');
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          toolbar.classList.toggle('scrolled', window.scrollY > 10);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+  }
+
+  // ============================
+  // SCROLL-TO-TOP
+  // ============================
+  function setupScrollToTop() {
+    const btn = document.getElementById('scroll-top');
+    if (!btn) return;
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          btn.classList.toggle('visible', window.scrollY > 600);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+    btn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // ============================
   // LOADING
   // ============================
+  function showSkeletons() {
+    const attractionsGrid = document.getElementById('attractions-grid');
+    const staysGrid = document.getElementById('stays-grid');
+    const skeleton = (withImage) => `
+      <div class="skeleton-card">
+        ${withImage ? '<div class="skeleton-image"></div>' : ''}
+        <div class="skeleton-body">
+          <div class="skeleton-line title"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+        </div>
+      </div>`;
+    attractionsGrid.innerHTML = skeleton(true).repeat(6);
+    staysGrid.innerHTML = skeleton(false).repeat(3);
+  }
+
   function hideLoading() {
     const el = document.getElementById('loading-overlay');
     el.classList.add('fade-out');
@@ -879,6 +949,10 @@
   // ============================
   async function init() {
     try {
+      showSkeletons();
+      setupToolbarShadow();
+      setupScrollToTop();
+
       const [attrRows, stayRows] = await Promise.all([
         fetchSheet(CONFIG.SHEET_ATTRACTIONS_URL),
         fetchSheet(CONFIG.SHEET_STAYS_URL),
