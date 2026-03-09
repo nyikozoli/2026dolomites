@@ -683,22 +683,49 @@
         setTimeout(() => indicator.classList.remove('show'), 1800);
       }
 
-      // Send to backend via GET (avoids CORS issues with POST redirects)
-      if (next && CONFIG.APPS_SCRIPT_URL) {
-        try {
-          const params = new URLSearchParams({
-            action: 'vote',
-            placeId: id,
-            placeName: place.name,
-            voteType: next,
-            voter,
-          });
-          // Use an image beacon — immune to CORS since it's a simple GET
-          const img = new Image();
-          img.src = CONFIG.APPS_SCRIPT_URL + '?' + params.toString();
-        } catch (err) {
-          console.warn('Vote post failed:', err);
-        }
+      // Send to backend via JSONP — sends vote AND returns correct aggregated counts
+      const sendVoteType = next || 'none'; // 'none' removes the vote on the server
+      if (CONFIG.APPS_SCRIPT_URL) {
+        const cbName = '_vs' + Date.now();
+        const params = new URLSearchParams({
+          action: 'vote',
+          placeId: id,
+          placeName: place.name,
+          voteType: sendVoteType,
+          voter,
+          callback: cbName,
+        });
+        const script = document.createElement('script');
+        let done = false;
+        window[cbName] = (data) => {
+          done = true;
+          delete window[cbName];
+          script.remove();
+          // Override local counts with server-aggregated data (correctly deduplicated)
+          if (data.status === 'ok' && data.votes) {
+            state.votes = data.votes;
+            updateVoteUI(id);
+            saveCachedVotes();
+          }
+        };
+        script.onerror = () => {
+          if (done) return;
+          delete window[cbName];
+          script.remove();
+          // Fallback: image beacon + delayed refresh to correct counts
+          const bp = new URLSearchParams({ action: 'vote', placeId: id, placeName: place.name, voteType: sendVoteType, voter });
+          new Image().src = CONFIG.APPS_SCRIPT_URL + '?' + bp.toString();
+          setTimeout(() => fetchVotes(), 3000);
+        };
+        script.src = CONFIG.APPS_SCRIPT_URL + '?' + params.toString();
+        document.head.appendChild(script);
+        // Timeout safety
+        setTimeout(() => {
+          if (!done && window[cbName]) {
+            delete window[cbName];
+            script.remove();
+          }
+        }, 10000);
       }
     });
   }

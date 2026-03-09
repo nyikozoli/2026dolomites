@@ -36,7 +36,7 @@ function doGet(e) {
     const voteType = e.parameter.voteType;
     const voter = e.parameter.voter;
 
-    if (placeId && voteType && voter && ['up', 'down'].includes(voteType)) {
+    if (placeId && voteType && voter && ['up', 'down', 'none'].includes(voteType)) {
       const sheet = getOrCreateSheet();
       sheet.appendRow([placeId, placeName, voteType, voter, new Date().toISOString()]);
     }
@@ -56,9 +56,9 @@ function doGet(e) {
 
     // Each voter keeps only their latest vote per place
     const prev = votes[placeId]._voters[voter];
-    if (prev) votes[placeId][prev]--;
+    if (prev && prev !== 'none') votes[placeId][prev]--;
     votes[placeId]._voters[voter] = voteType;
-    votes[placeId][voteType]++;
+    if (voteType !== 'none') votes[placeId][voteType]++;
   }
 
   // Strip internal voter tracking before returning
