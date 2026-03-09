@@ -24,7 +24,7 @@
   --color-hero-start: #1a1a2e;
   --color-hero-end: #16213e;
 
-  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
   --font-heading: 'Playfair Display', Georgia, serif;
 
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
@@ -95,14 +95,21 @@ img {
    ================================ */
 #hero {
   position: relative;
-  height: 28vh;
-  min-height: 200px;
-  max-height: 280px;
+  height: 45vh;
+  min-height: 300px;
+  max-height: 420px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: url('https://images.unsplash.com/photo-1589802829985-817e51171b92?w=1600&q=80') center 35% / cover no-repeat;
   overflow: hidden;
+}
+
+#hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('https://images.unsplash.com/photo-1589802829985-817e51171b92?w=1600&q=80') center 35% / cover no-repeat;
+  animation: heroZoom 25s ease-in-out infinite alternate;
 }
 
 .hero-overlay {
@@ -149,7 +156,7 @@ img {
   bottom: -1px;
   left: 0;
   width: 100%;
-  height: 50px;
+  height: 80px;
   z-index: 1;
 }
 
@@ -162,6 +169,11 @@ img {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes heroZoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
 }
 
 /* ================================
@@ -310,6 +322,11 @@ img {
   flex-shrink: 0;
 }
 
+#map.map-pulse {
+  box-shadow: 0 0 0 3px var(--color-attraction), var(--shadow-card);
+  transition: box-shadow 0.3s ease;
+}
+
 /* Custom markers */
 .custom-marker {
   background: none !important;
@@ -363,15 +380,24 @@ img {
   max-width: 1280px;
   margin: 0 auto;
   padding: 24px 24px 8px;
+  transition: opacity var(--transition-normal), transform var(--transition-normal);
+}
+
+.places-section.section-hidden {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  position: absolute;
+  visibility: hidden;
 }
 
 .section-heading {
   font-family: var(--font-heading);
-  font-size: 1.5rem;
+  font-size: 1.85rem;
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: 20px;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
   border-bottom: 2px solid var(--color-border);
   display: flex;
   align-items: center;
@@ -430,6 +456,11 @@ img {
 
 .place-card[data-type="stay"].highlighted {
   outline-color: var(--color-stay);
+}
+
+.place-card[data-type="stay"] {
+  border-left: 4px solid var(--color-stay);
+  background: linear-gradient(135deg, var(--color-stay-light) 0%, var(--color-surface) 40%);
 }
 
 /* Card Images / Carousel */
@@ -727,6 +758,7 @@ img {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 10px;
+  min-width: 0;
 }
 
 .card-link {
@@ -981,10 +1013,11 @@ img {
    ================================ */
 footer {
   text-align: center;
-  padding: 32px 24px;
-  color: var(--color-text-secondary);
-  font-size: 0.8rem;
+  padding: 48px 24px;
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
   border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
 }
 
 footer a {
@@ -1000,8 +1033,9 @@ footer a:hover {
    ================================ */
 @media (max-width: 768px) {
   #hero {
-    height: 35vh;
+    height: 38vh;
     min-height: 260px;
+    max-height: 340px;
   }
 
   .toolbar-inner {

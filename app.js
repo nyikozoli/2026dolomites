@@ -295,7 +295,7 @@
         <h3 class="card-title">${esc(p.name)}</h3>
         ${p.tags && p.tags.length ? `<div class="card-tags">${p.tags.map((t) => `<span class="tag" data-group="${tagGroup(t)}">${esc(t)}</span>`).join('')}</div>` : ''}
         <p class="card-description">${esc(p.description)}</p>
-        <button class="read-more-toggle" onclick="event.stopPropagation()">&#9656; Read more</button>
+        <button class="read-more-toggle" aria-expanded="false" onclick="event.stopPropagation()">&#9656; Read more</button>
         <div class="card-footer">
           ${p.links.length ? `<div class="card-links">${p.links.map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">${esc(l.label)} &rarr;</a>`).join('')}</div>` : '<span></span>'}
           <div class="vote-buttons">
@@ -332,8 +332,8 @@
     const attractions = filtered.filter((p) => p.type === 'attraction');
     const stays = filtered.filter((p) => p.type === 'stay');
 
-    attractionsSection.classList.toggle('hidden', attractions.length === 0);
-    staysSection.classList.toggle('hidden', stays.length === 0);
+    attractionsSection.classList.toggle('section-hidden', attractions.length === 0);
+    staysSection.classList.toggle('section-hidden', stays.length === 0);
     noResults.classList.toggle('hidden', filtered.length > 0);
 
     attractions.forEach((p, i) => attractionsGrid.appendChild(buildCard(p, i)));
@@ -376,6 +376,10 @@
       if (source === 'card') {
         map.flyTo(marker.getLatLng(), 13, { duration: 0.8 });
         marker.openPopup();
+        // Brief glow on map to draw eye
+        const mapEl = document.getElementById('map');
+        mapEl.classList.add('map-pulse');
+        setTimeout(() => mapEl.classList.remove('map-pulse'), 1200);
       }
     }
   }
@@ -394,10 +398,17 @@
   }
 
   function setupFilters() {
-    document.querySelectorAll('.filter-btn').forEach((btn) => {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    // Set initial aria-pressed
+    filterBtns.forEach((b) => b.setAttribute('aria-pressed', b.classList.contains('active')));
+    filterBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
-        document.querySelector('.filter-btn.active').classList.remove('active');
+        filterBtns.forEach((b) => {
+          b.classList.remove('active');
+          b.setAttribute('aria-pressed', 'false');
+        });
         btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
         state.activeFilter = btn.dataset.filter;
         renderCards();
         updateMapMarkers();
@@ -467,6 +478,7 @@
         e.stopPropagation();
         const expanded = desc.classList.toggle('expanded');
         toggle.innerHTML = expanded ? '&#9662; Show less' : '&#9656; Read more';
+        toggle.setAttribute('aria-expanded', expanded);
       });
     });
   }
@@ -696,15 +708,18 @@
     if (!card) return;
     const v = state.votes[id] || { up: 0, down: 0 };
     const uv = state.userVotes[id] || '';
+    const name = card.querySelector('.card-title')?.textContent || id;
     const up = card.querySelector('.upvote');
     const down = card.querySelector('.downvote');
     if (up) {
       up.querySelector('.vote-count').textContent = v.up;
       up.classList.toggle('active', uv === 'up');
+      up.setAttribute('aria-label', `Upvote ${name}, ${v.up} votes`);
     }
     if (down) {
       down.querySelector('.vote-count').textContent = v.down;
       down.classList.toggle('active', uv === 'down');
+      down.setAttribute('aria-label', `Downvote ${name}, ${v.down} votes`);
     }
   }
 
