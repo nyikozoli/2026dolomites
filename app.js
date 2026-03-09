@@ -246,10 +246,10 @@
           <div class="card-footer">
             <a href="${esc(p.link)}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">View details &rarr;</a>
             <div class="vote-buttons">
-              <button class="vote-btn upvote${uv === 'up' ? ' active' : ''}" data-id="${p.id}" data-vote="up" onclick="event.stopPropagation()">
+              <button class="vote-btn upvote${uv === 'up' ? ' active' : ''}" data-id="${p.id}" data-vote="up">
                 <span class="vote-icon">&#9650;</span> <span class="vote-count">${votes.up}</span>
               </button>
-              <button class="vote-btn downvote${uv === 'down' ? ' active' : ''}" data-id="${p.id}" data-vote="down" onclick="event.stopPropagation()">
+              <button class="vote-btn downvote${uv === 'down' ? ' active' : ''}" data-id="${p.id}" data-vote="down">
                 <span class="vote-icon">&#9660;</span> <span class="vote-count">${votes.down}</span>
               </button>
             </div>
