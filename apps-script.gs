@@ -48,7 +48,9 @@ function doGet(e) {
   const data = sheet.getDataRange().getValues();
   const votes = {};
 
-  for (let i = 1; i < data.length; i++) {
+  // Start at row 0 if there's no header, or row 1 if there is one
+  const startRow = (data.length > 0 && data[0][0] === 'PlaceID') ? 1 : 0;
+  for (let i = startRow; i < data.length; i++) {
     const [placeId, , voteType, voter] = data[i];
     if (!placeId) continue;
 
